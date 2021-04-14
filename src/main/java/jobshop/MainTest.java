@@ -69,19 +69,17 @@ public class MainTest {
         /*
             // Bellow is the code that can crash the app
             ResourceOrder crashRO = new ResourceOrder(instance);
-            crashRO.addTaskToMachine(0, new Task(0,1));
-
-            // We changed above task to try putting on machine 0 a wrong task.
-            // As the solution we are building no longer satisfies the constraints of the instance,
-            // the program crashes producing a RunTimeException when trying to schedule Task(0,1) on machine 0
-
-            // Code below isn't even evaluated, has the app already threw an exception
-            crashRO.addTaskToMachine(1, new Task(1,0));
             crashRO.addTaskToMachine(1, new Task(0,1));
+            crashRO.addTaskToMachine(1, new Task(1,0));
             crashRO.addTaskToMachine(0, new Task(1,1));
+            crashRO.addTaskToMachine(0, new Task(0,0));
             crashRO.addTaskToMachine(2, new Task(1,2));
             crashRO.addTaskToMachine(2, new Task(0,2));
+
+            System.out.println("\n\nMY CYCLE RESOURCE ORDER GANTT:" + crashRO.toSchedule().get().asciiGantt());
+
         */
+
 
 
         } catch (IOException e) {

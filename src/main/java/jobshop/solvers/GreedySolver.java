@@ -42,12 +42,22 @@ public class GreedySolver implements Solver {
 
             Task chosenTask = null;
 
+            ArrayList<Task> startingSoonest = null;
+
             switch(this.priority) {
                 case SPT:
                     chosenTask = makeSPTchoice(instance, possibleTasks);
                     break;
                 case LRPT:
                     chosenTask = makeLRPTchoice(instance, possibleTasks);
+                    break;
+                case EST_SPT:
+                    startingSoonest = makeEST_filter(instance, possibleTasks);
+                    chosenTask = makeSPTchoice(instance, startingSoonest);
+                    break;
+                case EST_LRPT:
+                    startingSoonest = makeEST_filter(instance, possibleTasks);
+                    chosenTask = makeLRPTchoice(instance, startingSoonest);
                     break;
                 default:
                     System.out.println("Exception, problem in priority for greedy");
@@ -68,8 +78,11 @@ public class GreedySolver implements Solver {
     // choice functions take the task from the list and suppresses it from the list.
     Task makeSPTchoice(Instance instance, ArrayList<Task> possibleTasks){
 
+        Task answer = null;
+
         int min_duration = instance.duration(possibleTasks.get(0));
         int min_index = 0;
+
         for(int i=1; i<possibleTasks.size(); ++i){
             int current_task_duration = instance.duration(possibleTasks.get(i));
             if( current_task_duration < min_duration){
@@ -78,7 +91,7 @@ public class GreedySolver implements Solver {
             }
         }
 
-        Task answer = possibleTasks.get(min_index);
+        answer = possibleTasks.get(min_index);
         possibleTasks.remove(min_index);
 
         return answer;
@@ -87,8 +100,9 @@ public class GreedySolver implements Solver {
 
     Task makeLRPTchoice(Instance instance, ArrayList<Task> possibleTasks){
 
-        int max_left_duration = -1;
         Task answer = null;
+
+        int max_left_duration = -1;
 
         for(Task t : possibleTasks){
 
@@ -110,5 +124,12 @@ public class GreedySolver implements Solver {
         return answer;
     }
 
+
+    ArrayList<Task> makeEST_filter(Instance instance, ArrayList<Task> possibleTasks){
+
+        ArrayList<Task> startingSoonest = new ArrayList<>(possibleTasks);
+
+        return startingSoonest;
+    }
 
 }

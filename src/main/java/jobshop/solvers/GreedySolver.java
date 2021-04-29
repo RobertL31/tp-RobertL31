@@ -38,7 +38,7 @@ public class GreedySolver implements Solver {
         // LOOP OVER POSSIBLE TASKS
         while(! possibleTasks.isEmpty()){
 
-            System.out.println(possibleTasks + "size is:" + possibleTasks.size());
+            //System.out.println(possibleTasks + "size is:" + possibleTasks.size());
 
             Task chosenTask = null;
 
@@ -88,23 +88,21 @@ public class GreedySolver implements Solver {
     Task makeLRPTchoice(Instance instance, ArrayList<Task> possibleTasks){
 
         int max_left_duration = -1;
-        int left_duration = 0;
         Task answer = null;
+
         for(Task t : possibleTasks){
-            /*if(t.task == instance.numTasks-1){
-                left_duration = 0;
-            } else {*/
-                for (int task = t.task; task < instance.numTasks; ++task) {
-                    left_duration += instance.duration(t.job, t.task);
-                }
-            //}
+
+            int left_duration = 0;
+
+            for (int task = t.task; task < instance.numTasks; ++task) {
+                left_duration += instance.duration(t.job, task);
+            }
 
             if(left_duration > max_left_duration){
                 max_left_duration = left_duration;
                 answer = t;
             }
 
-            left_duration = 0;
         }
 
         possibleTasks.remove(answer);

@@ -7,6 +7,8 @@ import jobshop.encodings.Task;
 
 import javax.naming.OperationNotSupportedException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.stream.Collectors;
 
 /** An empty shell to implement a greedy solver. */
 public class GreedySolver implements Solver {
@@ -52,11 +54,11 @@ public class GreedySolver implements Solver {
                     chosenTask = makeLRPTchoice(instance, possibleTasks);
                     break;
                 case EST_SPT:
-                    startingSoonest = makeEST_filter(instance, possibleTasks);
+                    startingSoonest = makeEST_filter(instance, possibleTasks, sol);
                     chosenTask = makeSPTchoice(instance, startingSoonest);
                     break;
                 case EST_LRPT:
-                    startingSoonest = makeEST_filter(instance, possibleTasks);
+                    startingSoonest = makeEST_filter(instance, possibleTasks, sol);
                     chosenTask = makeLRPTchoice(instance, startingSoonest);
                     break;
                 default:
@@ -125,9 +127,52 @@ public class GreedySolver implements Solver {
     }
 
 
-    ArrayList<Task> makeEST_filter(Instance instance, ArrayList<Task> possibleTasks){
+    ArrayList<Task> makeEST_filter(Instance instance, ArrayList<Task> possibleTasks, ResourceOrder sol){
 
-        ArrayList<Task> startingSoonest = new ArrayList<>(possibleTasks);
+
+        ArrayList<Integer> startingTimes = new ArrayList<>();
+
+        // For every possible tasks, we want to look at their machine, and when they start.
+        // We will take a look at every task planned on the machine, and their duration.
+        // Also, the task shouldn't start before the previous task of the same job finished.
+        // So that, the starting time of a task is the minimum between the time when the machine is available
+        // and the time the previous task of the same job finished.
+
+        for(Task t : possibleTasks){
+
+            int task_index = 0;
+            int machineEndTime = 0;
+            Task taskOfMachine = null;
+            do{
+                taskOfMachine = sol.getTaskOfMachine(instance.machine(t),task_index);
+                machineEndTime += instance.duration(taskOfMachine);
+                ++task_index;
+            }
+            while( taskOfMachine != null);
+
+
+
+
+            if(t.task == 0){
+                startingTimes.add(machineEndTime);
+            } else {
+
+                int tasksEndTime = 0;
+                for(int i=0; i<t.task; ++i) {
+                    tasksEndTime += instance.duration(new Task(t.job, i));
+                }
+
+                startingTimes.add( Math.max(machineEndTime, tasksEndTime));
+            }
+        }
+
+        ArrayList<Task> startingSoonest = new ArrayList<>();
+        int minimum = Collections.min(startingTimes);
+
+         for(int i=0; i<possibleTasks.size(); ++i){
+             if(startingTimes.get(i) == minimum)
+                 startingSoonest.add(possibleTasks.get(i));
+         }
 
         return startingSoonest;
     }

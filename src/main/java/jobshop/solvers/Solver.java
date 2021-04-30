@@ -18,10 +18,13 @@ public interface Solver {
     /** Static factory method to create a new solver based on its name. */
     static Solver getSolver(String name) {
         switch (name) {
-            case "basic": return new BasicSolver();
-            case "random": return new RandomSolver();
-            case "spt": return new GreedySolver(GreedySolver.Priority.SPT);
-            case "lrpt": return new GreedySolver(GreedySolver.Priority.LRPT);
+            case "basic":       return new BasicSolver();
+            case "random":      return new RandomSolver();
+            case "spt":         return new GreedySolver(GreedySolver.Priority.SPT);
+            case "lrpt":        return new GreedySolver(GreedySolver.Priority.LRPT);
+            case "est_spt":     return new GreedySolver(GreedySolver.Priority.EST_SPT);
+            case "est_lrpt":    return new GreedySolver(GreedySolver.Priority.EST_LRPT);
+
             default: throw new RuntimeException("Unknown solver: "+ name);
         }
     }

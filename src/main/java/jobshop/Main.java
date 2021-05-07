@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 import jobshop.encodings.Schedule;
 import jobshop.solvers.*;
+import jobshop.solvers.neighborhood.Nowicki;
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;

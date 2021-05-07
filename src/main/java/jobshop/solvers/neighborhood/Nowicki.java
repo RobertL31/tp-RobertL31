@@ -1,9 +1,11 @@
 package jobshop.solvers.neighborhood;
 
 import jobshop.encodings.ResourceOrder;
+import jobshop.encodings.Task;
 
 import java.util.ArrayList;
 import java.util.List;
+
 
 /** Implementation of the Nowicki and Smutnicki neighborhood.
  *
@@ -39,6 +41,10 @@ public class Nowicki extends Neighborhood<ResourceOrder> {
             this.machine = machine;
             this.firstTask = firstTask;
             this.lastTask = lastTask;
+        }
+
+        public String toString(){
+            return "Task " + firstTask + " to task " + lastTask + " belong to machine " + machine;
         }
     }
 
@@ -108,8 +114,39 @@ public class Nowicki extends Neighborhood<ResourceOrder> {
     }
 
     /** Returns a list of all the blocks of the critical path. */
-    List<Block> blocksOfCriticalPath(ResourceOrder order) {
-        throw new UnsupportedOperationException();
+    public static List<Block> blocksOfCriticalPath(ResourceOrder order) {
+
+        ArrayList<Block> answer = new ArrayList<>();
+        List<Task> criticalPath = order.toSchedule().get().criticalPath();
+
+        int currentBlockMachine = order.instance.machine(criticalPath.get(0));
+        int currentFirstTask = 0;
+        int currentLastTask = 0;
+
+        for(int i=1; i<criticalPath.size(); ++i){
+            int newMachine = order.instance.machine(criticalPath.get(i));
+            if( newMachine != currentBlockMachine ){
+                // If the block size is more than one, in that case, we validate the block
+                if(currentFirstTask != currentLastTask){
+                    answer.add(new Block(currentBlockMachine, currentFirstTask, currentLastTask));
+                }
+
+                // Initializing next block variables
+                currentFirstTask = i;
+                currentLastTask = i;
+                currentBlockMachine = newMachine;
+
+            } else {
+                // Current block size increased
+                currentLastTask = i;
+            }
+        }
+
+        if(currentFirstTask != currentLastTask){
+            answer.add(new Block(currentBlockMachine, currentFirstTask, currentLastTask));
+        }
+
+        return answer;
     }
 
     /** For a given block, return the possible swaps for the Nowicki and Smutnicki neighborhood */

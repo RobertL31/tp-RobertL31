@@ -99,7 +99,6 @@ public class GreedySolver implements Solver {
 
         }
 
-        System.out.println(Nowicki.blocksOfCriticalPath(sol));
         return new Result(instance, this.sol.toSchedule(), Result.ExitCause.Blocked);
     }
 

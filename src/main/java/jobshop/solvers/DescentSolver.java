@@ -38,8 +38,8 @@ public class DescentSolver implements Solver {
 
         while(deadline - System.currentTimeMillis() > 1){
 
-            Nowicki nowiki = (Nowicki) neighborhood;
-            List<Neighbor<ResourceOrder>> neighbors = nowiki.generateNeighbors(greedyRO);
+            Nowicki nowicki = (Nowicki) neighborhood;
+            List<Neighbor<ResourceOrder>> neighbors = nowicki.generateNeighbors(greedyRO);
 
             if(neighbors.isEmpty()){
                 return new Result(instance, greedyRO.toSchedule(), Result.ExitCause.Blocked);

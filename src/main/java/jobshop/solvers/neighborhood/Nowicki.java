@@ -116,7 +116,7 @@ public class Nowicki extends Neighborhood<ResourceOrder> {
     }
 
 
-    private static int getTaskIndexOnMachine(int machine, Task task, ResourceOrder current){
+    private int getTaskIndexOnMachine(int machine, Task task, ResourceOrder current){
         for(int i=0; i<current.instance.numJobs; ++i){
             if( current.getTaskOfMachine(machine, i).equals(task) ){
                 return i;
@@ -126,7 +126,7 @@ public class Nowicki extends Neighborhood<ResourceOrder> {
     }
 
     /** Returns a list of all the blocks of the critical path. */
-    public static List<Block> blocksOfCriticalPath(ResourceOrder order) {
+    public List<Block> blocksOfCriticalPath(ResourceOrder order) {
 
         ArrayList<Block> answer = new ArrayList<>();
         List<Task> criticalPath = order.toSchedule().get().criticalPath();

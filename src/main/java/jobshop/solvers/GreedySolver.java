@@ -14,6 +14,8 @@ import java.util.stream.Collectors;
 /** An empty shell to implement a greedy solver. */
 public class GreedySolver implements Solver {
 
+    private ResourceOrder sol;
+
     /** All possible priorities for the greedy solver. */
     public enum Priority {
         SPT, LPT, SRPT, LRPT, EST_SPT, EST_LPT, EST_SRPT, EST_LRPT
@@ -34,7 +36,7 @@ public class GreedySolver implements Solver {
         int[] freeTimeOfJob = new int[instance.numJobs];
 
         ArrayList<Task> possibleTasks = new ArrayList<Task>();
-        ResourceOrder sol = new ResourceOrder(instance);
+        this.sol = new ResourceOrder(instance);
 
         // INITIALIZATION
         for(int njob=0; njob<instance.numJobs; ++njob){
@@ -75,7 +77,7 @@ public class GreedySolver implements Solver {
             if( chosenTask.task < instance.numTasks-1){
                 possibleTasks.add(new Task(chosenTask.job, chosenTask.task+1));
             }
-            sol.addTaskToMachine(instance.machine(chosenTask), chosenTask);
+            this.sol.addTaskToMachine(instance.machine(chosenTask), chosenTask);
 
             //In every case, freeTime will be increased by the duration
 
@@ -98,7 +100,7 @@ public class GreedySolver implements Solver {
         }
 
         System.out.println(Nowicki.blocksOfCriticalPath(sol));
-        return new Result(instance, sol.toSchedule(), Result.ExitCause.Blocked);
+        return new Result(instance, this.sol.toSchedule(), Result.ExitCause.Blocked);
     }
 
 
@@ -177,6 +179,11 @@ public class GreedySolver implements Solver {
         //System.out.println("-------------");
 
         return startingSoonest;
+    }
+
+
+    public ResourceOrder getResourceOrder(){
+        return this.sol;
     }
 
 }

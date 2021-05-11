@@ -1,5 +1,7 @@
 package jobshop;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.PrintStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -141,6 +143,13 @@ public class Main {
                     output.flush();
 
                     System.out.println(result.schedule.get().asciiGantt());
+
+                    FileWriter file = new FileWriter("score.txt");
+                    ArrayList<Integer> scores = ((DescentSolver) solver).makespans;
+                    for(int i=0; i<scores.size(); ++i){
+                        file.write(scores.get(i).toString() + "\n");
+                    }
+
                 }
                 output.println();
             }
@@ -151,6 +160,9 @@ public class Main {
             for(int solverId = 0 ; solverId < solversToTest.size() ; solverId++) {
                 output.printf("%7.1f %8s %5.1f        ", avg_runtimes[solverId], "-", avg_distances[solverId]);
             }
+
+
+
 
 
 

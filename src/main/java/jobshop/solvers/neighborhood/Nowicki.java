@@ -3,6 +3,7 @@ package jobshop.solvers.neighborhood;
 import jobshop.encodings.ResourceOrder;
 import jobshop.encodings.Task;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +16,7 @@ import java.util.List;
  * last two tasks of the block.
  */
 public class Nowicki extends Neighborhood<ResourceOrder> {
+
 
     /** A block represents a subsequence of the critical path such that all tasks in it execute on the same machine.
      * This class identifies a block in a ResourceOrder representation.
@@ -84,13 +86,13 @@ public class Nowicki extends Neighborhood<ResourceOrder> {
         /** Apply this swap on the given ResourceOrder, transforming it into a new solution. */
         @Override
         public void applyOn(ResourceOrder current) {
-            throw new UnsupportedOperationException();
+            current.swapTasks(this.machine, this.t1, this.t2);
         }
 
         /** Unapply this swap on the neighbor, transforming it back into the original solution. */
         @Override
         public void undoApplyOn(ResourceOrder current) {
-            throw new UnsupportedOperationException();
+            current.swapTasks(this.machine, this.t1, this.t2);
         }
     }
 
@@ -108,9 +110,19 @@ public class Nowicki extends Neighborhood<ResourceOrder> {
         // iterate over all blocks of the critical path
         for(var block : blocksOfCriticalPath(current)) {
             // for this block, compute all neighbors and add them to the list of neighbors
-            neighbors.addAll(neighbors(block));
+            neighbors.addAll(neighbors(block, current));
         }
         return neighbors;
+    }
+
+
+    private static int getTaskIndexOnMachine(int machine, Task task, ResourceOrder current){
+        for(int i=0; i<current.instance.numJobs; ++i){
+            if( current.getTaskOfMachine(machine, i).equals(task) ){
+                return i;
+            }
+        }
+        return -1;
     }
 
     /** Returns a list of all the blocks of the critical path. */
@@ -119,12 +131,16 @@ public class Nowicki extends Neighborhood<ResourceOrder> {
         ArrayList<Block> answer = new ArrayList<>();
         List<Task> criticalPath = order.toSchedule().get().criticalPath();
 
-        int currentBlockMachine = order.instance.machine(criticalPath.get(0));
-        int currentFirstTask = 0;
-        int currentLastTask = 0;
+        int currentBlockMachine = -1;
+        int currentFirstTask = -1;
+        int currentLastTask = -1;
+        int newMachine = -1;
 
-        for(int i=1; i<criticalPath.size(); ++i){
-            int newMachine = order.instance.machine(criticalPath.get(i));
+        for(int i=0; i<criticalPath.size(); ++i){
+
+            newMachine = order.instance.machine(criticalPath.get(i));
+
+
             if( newMachine != currentBlockMachine ){
                 // If the block size is more than one, in that case, we validate the block
                 if(currentFirstTask != currentLastTask){
@@ -132,27 +148,66 @@ public class Nowicki extends Neighborhood<ResourceOrder> {
                 }
 
                 // Initializing next block variables
-                currentFirstTask = i;
-                currentLastTask = i;
+                int current_index = getTaskIndexOnMachine(newMachine, criticalPath.get(i), order );
+                currentFirstTask = current_index;
+                currentLastTask = current_index;
                 currentBlockMachine = newMachine;
 
             } else {
                 // Current block size increased
-                currentLastTask = i;
+                currentLastTask = getTaskIndexOnMachine(currentBlockMachine, criticalPath.get(i), order );
             }
+
         }
 
         if(currentFirstTask != currentLastTask){
-            answer.add(new Block(currentBlockMachine, currentFirstTask, currentLastTask));
+            answer.add(new Block(newMachine, currentFirstTask, currentLastTask));
         }
 
         return answer;
+
+
+
     }
 
     /** For a given block, return the possible swaps for the Nowicki and Smutnicki neighborhood */
-    List<Swap> neighbors(Block block) {
-        throw new UnsupportedOperationException();
+    List<Swap> neighbors(Block block, ResourceOrder current) {
 
+        if(block.firstTask == block.lastTask) return null;
+
+        ArrayList<Swap> answer = new ArrayList<>();
+
+        if(block.lastTask - block.firstTask == 1){
+            Swap swap = new Swap(block.machine, block.firstTask, block.lastTask);
+            swap.applyOn(current);
+            if(current.toSchedule().get() != null){
+                answer.add(swap);
+            } else {
+                System.out.println("--\nNOT VALID RESOURCE ORDER PRODUCED\n--");
+            }
+            swap.undoApplyOn(current);
+
+        } else {
+            Swap swap1 = new Swap(block.machine, block.firstTask, block.firstTask+1);
+            Swap swap2 = new Swap(block.machine, block.lastTask-1, block.lastTask);
+            swap1.applyOn(current);
+            if(current.toSchedule().get() != null){
+                answer.add(swap1);
+            } else {
+                System.out.println("--\nNOT VALID RESOURCE ORDER PRODUCED\n--");
+            }
+            swap1.undoApplyOn(current);
+
+            swap2.applyOn(current);
+            if(current.toSchedule().get() != null){
+                answer.add(swap2);
+            } else {
+                System.out.println("--\nNOT VALID RESOURCE ORDER PRODUCED\n--");
+            }
+            swap2.undoApplyOn(current);
+        }
+
+        return answer;
     }
 
 }

@@ -60,8 +60,13 @@ public class DescentSolver implements Solver {
                 }
             }
 
-            makespans.add(best_makespan);
-            best.applyOn(greedyRO);
+            if(greedyRO.toSchedule().get().makespan() > best_makespan){
+                makespans.add(best_makespan);
+                best.applyOn(greedyRO);
+            } else {
+                return new Result(instance, greedyRO.toSchedule(), Result.ExitCause.Blocked);
+
+            }
         }
 
 

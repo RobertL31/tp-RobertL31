@@ -149,6 +149,7 @@ public class Main {
                     for(int i=0; i<scores.size(); ++i){
                         file.write(scores.get(i).toString() + "\n");
                     }
+                    file.close();
 
                 }
                 output.println();

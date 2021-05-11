@@ -25,7 +25,7 @@ public interface Solver {
             case "lrpt":        return new GreedySolver(GreedySolver.Priority.LRPT);
             case "est_spt":     return new GreedySolver(GreedySolver.Priority.EST_SPT);
             case "est_lrpt":    return new GreedySolver(GreedySolver.Priority.EST_LRPT);
-            case "descent":     return new DescentSolver(new Nowicki(), new GreedySolver(GreedySolver.Priority.EST_SPT));
+            case "descent":     return new DescentSolver(new Nowicki(), new GreedySolver(GreedySolver.Priority.SPT));
 
             default: throw new RuntimeException("Unknown solver: "+ name);
         }

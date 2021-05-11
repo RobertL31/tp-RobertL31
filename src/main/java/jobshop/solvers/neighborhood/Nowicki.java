@@ -173,8 +173,6 @@ public class Nowicki extends Neighborhood<ResourceOrder> {
     /** For a given block, return the possible swaps for the Nowicki and Smutnicki neighborhood */
     List<Swap> neighbors(Block block, ResourceOrder current) {
 
-        if(block.firstTask == block.lastTask) return null;
-
         ArrayList<Swap> answer = new ArrayList<>();
 
         if(block.lastTask - block.firstTask == 1){

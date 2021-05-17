@@ -30,6 +30,8 @@ public class Result {
         /** The solution has been proved optimal and thus can no longer be improved. */
         ProvedOptimal,
         /** The solver was not able to further improve the solution (e.g. blocked in a local minima. */
-        Blocked
+        Blocked,
+        /** The solver can have a specific maximum number of iterations (Taboo) **/
+        MaxIteration
     }
 }

@@ -16,7 +16,7 @@ for line in lines:
     x.append(int(line))
     
     
-plt.plot(x, color = "red", marker='.', linestyle = "dotted", markersize=5, markerfacecolor='blue')
+plt.plot(x, marker='.', linestyle = "dotted", markersize=1, markerfacecolor='blue')
 plt.title("Jobshop optimization")
 plt.xlabel("iteration number")
 plt.ylabel("makespan")

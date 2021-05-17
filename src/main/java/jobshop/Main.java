@@ -142,10 +142,10 @@ public class Main {
                     output.printf("%7d %8s %5.1f        ", runtime, makespan, dist);
                     output.flush();
 
-                    System.out.println(result.schedule.get().asciiGantt());
+                    //System.out.println(result.schedule.get().asciiGantt());
 
                     FileWriter file = new FileWriter("score.txt");
-                    ArrayList<Integer> scores = ((DescentSolver) solver).makespans;
+                    ArrayList<Integer> scores = ((TabooSolver) solver).getMakespans();
                     for(int i=0; i<scores.size(); ++i){
                         file.write(scores.get(i).toString() + "\n");
                     }

@@ -16,7 +16,7 @@ public class DescentSolver implements Solver {
     final Neighborhood<ResourceOrder> neighborhood;
     final Solver baseSolver;
 
-    public ArrayList<Integer> makespans = new ArrayList<Integer>();
+    private ArrayList<Integer> makespans = new ArrayList<Integer>();
 
     /** Creates a new descent solver with a given neighborhood and a solver for the initial solution.
      *
@@ -31,46 +31,49 @@ public class DescentSolver implements Solver {
     @Override
     public Result solve(Instance instance, long deadline) {
 
-        GreedySolver sol = (GreedySolver) baseSolver;
+        Solver sol = baseSolver;
         Result res = sol.solve(instance, deadline);
-        ResourceOrder greedyRO = sol.getResourceOrder();
+        ResourceOrder ro = new ResourceOrder(res.schedule.get());
 
 
         while(deadline - System.currentTimeMillis() > 1){
 
             Nowicki nowicki = (Nowicki) neighborhood;
-            List<Neighbor<ResourceOrder>> neighbors = nowicki.generateNeighbors(greedyRO);
+            List<Neighbor<ResourceOrder>> neighbors = nowicki.generateNeighbors(ro);
 
             if(neighbors.isEmpty()){
-                return new Result(instance, greedyRO.toSchedule(), Result.ExitCause.Blocked);
+                return new Result(instance, ro.toSchedule(), Result.ExitCause.Blocked);
             }
 
             Neighbor<ResourceOrder> best = neighbors.get(0);
-            best.applyOn(greedyRO);
-            int best_makespan = greedyRO.toSchedule().get().makespan();
-            best.undoApplyOn(greedyRO);
+            best.applyOn(ro);
+            int best_makespan = ro.toSchedule().get().makespan();
+            best.undoApplyOn(ro);
 
             for(int i=1; i<neighbors.size(); ++i){
-                neighbors.get(i).applyOn(greedyRO);
-                int new_makespan = greedyRO.toSchedule().get().makespan();
-                neighbors.get(i).undoApplyOn(greedyRO);
+                neighbors.get(i).applyOn(ro);
+                int new_makespan = ro.toSchedule().get().makespan();
+                neighbors.get(i).undoApplyOn(ro);
                 if( new_makespan < best_makespan){
                     best_makespan = new_makespan;
                     best = neighbors.get(i);
                 }
             }
 
-            if(greedyRO.toSchedule().get().makespan() > best_makespan){
+            if(ro.toSchedule().get().makespan() > best_makespan){
                 makespans.add(best_makespan);
-                best.applyOn(greedyRO);
+                best.applyOn(ro);
             } else {
-                return new Result(instance, greedyRO.toSchedule(), Result.ExitCause.Blocked);
+                return new Result(instance, ro.toSchedule(), Result.ExitCause.Blocked);
 
             }
         }
 
 
-        return new Result(instance, greedyRO.toSchedule(), Result.ExitCause.Timeout);
+        return new Result(instance, ro.toSchedule(), Result.ExitCause.Timeout);
     }
 
+    public ArrayList<Integer> getMakespans(){
+        return this.makespans;
+    }
 }

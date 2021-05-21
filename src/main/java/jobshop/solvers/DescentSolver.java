@@ -76,4 +76,6 @@ public class DescentSolver implements Solver {
     public ArrayList<Integer> getMakespans(){
         return this.makespans;
     }
+
+    public void deleteMakespan(){ this.makespans.clear();}
 }

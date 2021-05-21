@@ -18,6 +18,8 @@ import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
 import net.sourceforge.argparse4j.inf.Namespace;
 
+import javax.swing.*;
+
 /**
  * This class is the main entry point for doing comparative performance tests of solvers.
  */
@@ -60,7 +62,7 @@ public class Main {
         PrintStream output = System.out;
 
         // convert the timeout from seconds to milliseconds.
-        long solveTimeMs = ns.getLong("timeout") * 1000;
+        long solveTimeMs = ns.getLong("timeout") * 3000;
 
         // Get the list of solvers that we should benchmark.
         // We also check that we have a solver available for the given name and print an error message otherwise.
@@ -112,6 +114,16 @@ public class Main {
                 output.printf("%-8s %-5s %4d      ",instanceName, instance.numJobs +"x"+instance.numTasks, bestKnown);
 
                 // run all selected solvers on the instance and print the results
+
+
+                File file = new File("score.txt");
+                if(file.exists() && file.isFile()){
+                    file.delete();
+                }
+
+                file.createNewFile();
+
+
                 for(int solverId = 0 ; solverId < solvers.size() ; solverId++) {
                     // Select the next solver to run. Given the solver name passed on the command line,
                     // we lookup the `Main.solvers` hash map to get the solver object with the given name.
@@ -144,14 +156,38 @@ public class Main {
 
                     //System.out.println(result.schedule.get().asciiGantt());
 
-                    FileWriter file = new FileWriter("score.txt");
-                    ArrayList<Integer> scores = ((TabooSolver) solver).getMakespans();
-                    for(int i=0; i<scores.size(); ++i){
-                        file.write(scores.get(i).toString() + "\n");
+                    if(solver instanceof  TabooSolver || solver instanceof  DescentSolver){
+
+                        ArrayList<Integer> scores = null;
+
+                        if(solver instanceof TabooSolver) scores = ((TabooSolver) solver).getMakespans();
+                        if(solver instanceof DescentSolver) scores = ((DescentSolver) solver).getMakespans();
+
+                        FileWriter fileW = new FileWriter("score.txt", true);
+                        for(int i=0; i<scores.size(); ++i){
+                            fileW.write(scores.get(i).toString() + "\n");
+                        }
+                        fileW.write(solversToTest.get(solverId) + "\n");
+                        fileW.close();
+
+                        if(solver instanceof TabooSolver) ((TabooSolver) solver).deleteMakespan();
+                        if(solver instanceof DescentSolver) ((DescentSolver) solver).deleteMakespan();
+
                     }
-                    file.close();
 
                 }
+
+                String command = "python3 ./plot.py ./plots " + instanceName;
+                Runtime runtime1 = Runtime.getRuntime();
+                Process process = null;
+
+                try{
+                    process = runtime1.exec(command);
+                    process.waitFor();
+                } catch(Exception err){
+                    err.getStackTrace();
+                }
+
                 output.println();
             }
 

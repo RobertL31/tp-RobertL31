@@ -185,4 +185,5 @@ public class GreedySolver implements Solver {
         return this.sol;
     }
 
+
 }

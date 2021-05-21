@@ -65,38 +65,6 @@ public class TabooSolver implements Solver {
             Neighbor<ResourceOrder> best = null;
             int best_makespan = Integer.MAX_VALUE;
 
-            /*
-            for(int i=0; i<neighbors.size(); ++i){
-                Neighbor<ResourceOrder> actual = neighbors.get(i);
-                if( ! forbidden(actual, instance) ) {
-                    actual.applyOn(ro);
-                    int new_makespan = ro.toSchedule().get().makespan();
-                    actual.undoApplyOn(ro);
-                    if (new_makespan < best_makespan) {
-                        best_makespan = new_makespan;
-                        best = actual;
-                    }
-                }
-            }*/
-/*
-            for(int i=0; i<neighbors.size(); ++i){
-                Neighbor<ResourceOrder> actual = neighbors.get(i);
-                actual.applyOn(ro);
-                int new_makespan = ro.toSchedule().get().makespan();
-                actual.undoApplyOn(ro);
-                // If it's even better than actual makespan, we take it anyway
-                if(new_makespan < bestRO.toSchedule().get().makespan()){
-                    best_makespan = new_makespan;
-                    best = actual;
-                } else {
-                    // Otherwise, we apply classical taboo method
-                    if( ! forbidden(actual, instance) && new_makespan < best_makespan) {
-                            best_makespan = new_makespan;
-                            best = actual;
-                    }
-                }
-            }*/
-
             for(int i=0; i<neighbors.size(); ++i){
                 Neighbor<ResourceOrder> actual = neighbors.get(i);
                 actual.applyOn(ro);
@@ -159,5 +127,7 @@ public class TabooSolver implements Solver {
         return tabooMatrice[t1_index][t2_index] > numIter + tabooTime
                 ||  tabooMatrice[t2_index][t1_index] > numIter + tabooTime;
     }
+
+    public void deleteMakespan(){ this.makespans.clear();}
 
 }
